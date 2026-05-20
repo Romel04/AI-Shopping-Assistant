@@ -1,0 +1,18 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  // This line tells Prisma 7 to put the compiled client inside a local folder
+  output   = "../src/generated/client"
+}
+
+model InventoryItem {
+  id        String   @id @default(uuid())
+  name      String
+  category  String
+  price     Float
+  stock     Int
+  dateAdded DateTime @default(now())
+}
