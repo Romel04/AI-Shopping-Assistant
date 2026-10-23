@@ -1,9 +1,9 @@
-import * as sqlite3 from 'sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 const dbPath = path.resolve(__dirname, 'dev.db');
-const db = new sqlite3.Database(dbPath);
+const db = new DatabaseSync(dbPath);
 
 type SeedItem = {
   name: string;
@@ -240,46 +240,37 @@ const items: SeedItem[] = [
   },
 ];
 
-db.serialize(() => {
-  // Make sure the table exists (fresh deploys have no database yet)
-  db.run(`CREATE TABLE IF NOT EXISTS "InventoryItem" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "name" TEXT NOT NULL,
-    "category" TEXT NOT NULL,
-    "price" REAL NOT NULL,
-    "stock" INTEGER NOT NULL,
-    "imageUrl" TEXT,
-    "dateAdded" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-  )`);
+// Make sure the table exists (fresh deploys have no database yet)
+db.exec(`CREATE TABLE IF NOT EXISTS "InventoryItem" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "name" TEXT NOT NULL,
+  "category" TEXT NOT NULL,
+  "price" REAL NOT NULL,
+  "stock" INTEGER NOT NULL,
+  "imageUrl" TEXT,
+  "dateAdded" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+)`);
 
-  // Wipe existing data
-  db.run('DELETE FROM InventoryItem', (err) => {
-    if (err) console.error('Error clearing table:', err);
-    else console.log('✓ Cleared existing inventory data');
-  });
+// Wipe existing data
+db.exec('DELETE FROM InventoryItem');
+console.log('✓ Cleared existing inventory data');
 
-  const stmt = db.prepare(
-    'INSERT INTO InventoryItem (id, name, category, price, stock, imageUrl, dateAdded) VALUES (?, ?, ?, ?, ?, ?, ?)',
+const insert = db.prepare(
+  'INSERT INTO InventoryItem (id, name, category, price, stock, imageUrl, dateAdded) VALUES (?, ?, ?, ?, ?, ?, ?)',
+);
+
+for (const item of items) {
+  insert.run(
+    uuidv4(),
+    item.name,
+    item.category,
+    item.price,
+    item.stock,
+    item.imageUrl,
+    new Date().toISOString(),
   );
+  console.log(`✓ Inserted: ${item.name}`);
+}
 
-  for (const item of items) {
-    stmt.run(
-      uuidv4(),
-      item.name,
-      item.category,
-      item.price,
-      item.stock,
-      item.imageUrl,
-      new Date().toISOString(),
-      (err: Error | null) => {
-        if (err) console.error(`✗ Failed to insert "${item.name}":`, err);
-        else console.log(`✓ Inserted: ${item.name}`);
-      },
-    );
-  }
-
-  stmt.finalize(() => {
-    console.log(`\n🎉 Database re-seeded with ${items.length} premium products!`);
-    db.close();
-  });
-});
+db.close();
+console.log(`\n🎉 Database re-seeded with ${items.length} premium products!`);
