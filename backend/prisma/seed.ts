@@ -126,9 +126,132 @@ const items: SeedItem[] = [
     stock: 9,
     imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80',
   },
+    // ── More Apparel ──────────────────────────────────────────────────────────
+  {
+    name: 'Classic Linen Shirt - White',
+    category: 'Apparel',
+    price: 2200,
+    stock: 24,
+    imageUrl: 'https://picsum.photos/seed/linen-shirt/800/600',
+  },
+  {
+    name: 'Cotton Kurti - Sage Green',
+    category: 'Apparel',
+    price: 1650,
+    stock: 30,
+    imageUrl: 'https://picsum.photos/seed/cotton-kurti/800/600',
+  },
+  {
+    name: 'Slim-Fit Chino Trousers',
+    category: 'Apparel',
+    price: 2400,
+    stock: 16,
+    imageUrl: 'https://picsum.photos/seed/chino-trousers/800/600',
+  },
+  {
+    name: 'Nakshi Kantha Embroidered Shawl',
+    category: 'Apparel',
+    price: 3200,
+    stock: 0,
+    imageUrl: 'https://picsum.photos/seed/kantha-shawl/800/600',
+  },
+
+  // ── More Tech & Gadgets ───────────────────────────────────────────────────
+  {
+    name: 'Wireless Earbuds with ANC',
+    category: 'Tech & Gadgets',
+    price: 4800,
+    stock: 25,
+    imageUrl: 'https://picsum.photos/seed/wireless-earbuds/800/600',
+  },
+  {
+    name: '20,000mAh Fast-Charge Power Bank',
+    category: 'Tech & Gadgets',
+    price: 2600,
+    stock: 40,
+    imageUrl: 'https://picsum.photos/seed/power-bank/800/600',
+  },
+  {
+    name: 'Portable Bluetooth Speaker',
+    category: 'Tech & Gadgets',
+    price: 3300,
+    stock: 0,
+    imageUrl: 'https://picsum.photos/seed/bt-speaker/800/600',
+  },
+  {
+    name: 'Aluminium Laptop Stand',
+    category: 'Tech & Gadgets',
+    price: 1900,
+    stock: 28,
+    imageUrl: 'https://picsum.photos/seed/laptop-stand/800/600',
+  },
+
+  // ── More Home & Living ────────────────────────────────────────────────────
+  {
+    name: 'Cotton Bed Sheet Set (Queen)',
+    category: 'Home & Living',
+    price: 3400,
+    stock: 12,
+    imageUrl: 'https://picsum.photos/seed/bed-sheets/800/600',
+  },
+  {
+    name: 'Bamboo Floating Wall Shelf',
+    category: 'Home & Living',
+    price: 1750,
+    stock: 14,
+    imageUrl: 'https://picsum.photos/seed/wall-shelf/800/600',
+  },
+  {
+    name: 'Ceramic Table Lamp',
+    category: 'Home & Living',
+    price: 2800,
+    stock: 9,
+    imageUrl: 'https://picsum.photos/seed/table-lamp/800/600',
+  },
+  {
+    name: 'Woven Storage Basket Set (3 pcs)',
+    category: 'Home & Living',
+    price: 1450,
+    stock: 33,
+    imageUrl: 'https://picsum.photos/seed/storage-baskets/800/600',
+  },
+
+  // ── More Fitness & Lifestyle ──────────────────────────────────────────────
+  {
+    name: 'Adjustable Dumbbell Pair (10 kg)',
+    category: 'Fitness & Lifestyle',
+    price: 4500,
+    stock: 7,
+    imageUrl: 'https://picsum.photos/seed/dumbbells/800/600',
+  },
+  {
+    name: 'Resistance Band Set (5 pcs)',
+    category: 'Fitness & Lifestyle',
+    price: 950,
+    stock: 50,
+    imageUrl: 'https://picsum.photos/seed/resistance-bands/800/600',
+  },
+  {
+    name: 'Speed Jump Rope',
+    category: 'Fitness & Lifestyle',
+    price: 480,
+    stock: 0,
+    imageUrl: 'https://picsum.photos/seed/jump-rope/800/600',
+  },
 ];
 
 db.serialize(() => {
+  // Make sure the table exists (fresh deploys have no database yet)
+  db.run(`CREATE TABLE IF NOT EXISTS "InventoryItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "price" REAL NOT NULL,
+    "stock" INTEGER NOT NULL,
+    "imageUrl" TEXT,
+    "dateAdded" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   // Wipe existing data
   db.run('DELETE FROM InventoryItem', (err) => {
     if (err) console.error('Error clearing table:', err);
@@ -156,7 +279,7 @@ db.serialize(() => {
   }
 
   stmt.finalize(() => {
-    console.log('\n🎉 Database re-seeded with 15 premium products!');
+    console.log(`\n🎉 Database re-seeded with ${items.length} premium products!`);
     db.close();
   });
 });
